@@ -4,7 +4,7 @@ win下 批命令执行视频切片hls
 
 FFmpeg项目：FFmpeg-Builds(https://github.com/BtbN/FFmpeg-Builds)
 
-下载win: ffmpeg-master-latest-win64-gpl.zip([https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip))
+下载win： [ffmpeg-master-latest-win64-gpl.zip](https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip)
 
 根目录/
 

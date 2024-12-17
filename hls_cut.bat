@@ -1,7 +1,6 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-
 :: 定义目录路径
 set ROOT_DIR=%~dp0
 set VIDEO_DIR=%ROOT_DIR%video
@@ -66,11 +65,12 @@ echo 切片文件命名格式：%HLS_SEGMENT_FILENAME%
 echo 播放列表文件名：%PLAYLIST_NAME%
 echo 输出目录：%OUTPUT_DIR%
 
-:: 执行切片
+:: 执行切片，确保生成完整的 .m3u8 文件
 ffmpeg -i "%VIDEO_DIR%\%LATEST_VIDEO%" ^
        -c:v copy -c:a copy ^
        -hls_time %SEGMENT_DURATION% ^
        -hls_segment_filename "%OUTPUT_DIR%\%HLS_SEGMENT_FILENAME%" ^
+       -hls_list_size 0 ^
        "%OUTPUT_DIR%\%PLAYLIST_NAME%"
 
 :: 检查切片是否成功

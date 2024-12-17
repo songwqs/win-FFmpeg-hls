@@ -2,9 +2,9 @@ win下 批命令执行视频切片hls
 
 需要 FFmpeg支持 确保环境变量配置好了FFmpeg
 
-FFmpeg-win下载：FFmpeg-Builds(https://github.com/BtbN/FFmpeg-Builds)
+FFmpeg项目：FFmpeg-Builds(https://github.com/BtbN/FFmpeg-Builds)
 
-ffmpeg-master-latest-win64-gpl.zip(https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip)
+下载win: ffmpeg-master-latest-win64-gpl.zip(https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip)
 
 根目录/
 

@@ -1,6 +1,7 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
+
 :: 定义目录路径
 set ROOT_DIR=%~dp0
 set VIDEO_DIR=%ROOT_DIR%video
@@ -17,20 +18,6 @@ if not exist "%VIDEO_DIR%" (
 :: 检查 m3u8 目录是否存在，不存在则创建
 if not exist "%M3U8_DIR%" (
     mkdir "%M3U8_DIR%"
-)
-
-:: 获取最新视频文件
-set LATEST_VIDEO=
-for /f "delims=" %%i in ('dir "%VIDEO_DIR%\*" /b /o-d /a:-d') do (
-    set LATEST_VIDEO=%%i
-    goto :found_video
-)
-:found_video
-
-if not defined LATEST_VIDEO (
-    echo 视频目录为空，请放置视频文件。
-    pause
-    exit /b
 )
 
 :: 加载配置文件，设置默认参数
@@ -50,34 +37,35 @@ if exist "%CONFIG_FILE%" (
     echo 配置文件 config.txt 不存在，使用默认参数。
 )
 
-:: 创建以时间戳命名的子目录
-for /f "tokens=2 delims==" %%T in ('wmic os get localdatetime /value') do set TIMESTAMP=%%T
-set TIMESTAMP=%TIMESTAMP:~0,8%_%TIMESTAMP:~8,6%
-set OUTPUT_DIR=%M3U8_DIR%\%TIMESTAMP%
-mkdir "%OUTPUT_DIR%"
+:: 遍历 video 目录中的视频文件，并为每个视频文件创建子目录并切片
+for %%i in ("%VIDEO_DIR%\*.mp4") do (
+    set "VIDEO_FILE=%%~ni"  :: 获取文件名（不带扩展名）
+    set "SUB_DIR=%M3U8_DIR%\!VIDEO_FILE!"
+    
+    :: 如果子目录不存在，则创建
+    if not exist "!SUB_DIR!" (
+        mkdir "!SUB_DIR!"
+        echo 已为视频文件 "%%i" 创建子目录 "!SUB_DIR!"。
+    ) else (
+        echo 子目录 "!SUB_DIR!" 已存在，跳过创建。
+    )
 
-:: 输出当前配置信息
-echo 当前配置：
-echo 视频文件：%LATEST_VIDEO%
-echo 切片时长：%SEGMENT_DURATION% 秒
-echo 输出格式：%OUTPUT_FORMAT%
-echo 切片文件命名格式：%HLS_SEGMENT_FILENAME%
-echo 播放列表文件名：%PLAYLIST_NAME%
-echo 输出目录：%OUTPUT_DIR%
+    :: 切片命令
+    echo 开始切片视频 "%%i" 并保存到子目录 "!SUB_DIR!"...
 
-:: 执行切片，确保生成完整的 .m3u8 文件
-ffmpeg -i "%VIDEO_DIR%\%LATEST_VIDEO%" ^
-       -c:v copy -c:a copy ^
-       -hls_time %SEGMENT_DURATION% ^
-       -hls_segment_filename "%OUTPUT_DIR%\%HLS_SEGMENT_FILENAME%" ^
-       -hls_list_size 0 ^
-       "%OUTPUT_DIR%\%PLAYLIST_NAME%"
+    ffmpeg -i "%%i" ^
+           -c:v copy -c:a copy ^
+           -hls_time %SEGMENT_DURATION% ^
+           -hls_segment_filename "!SUB_DIR!\%HLS_SEGMENT_FILENAME%" ^
+           -hls_list_size 0 ^
+           "!SUB_DIR!\%PLAYLIST_NAME%"
 
-:: 检查切片是否成功
-if %ERRORLEVEL% EQU 0 (
-    echo 切片完成！文件已保存至：%OUTPUT_DIR%
-) else (
-    echo 切片失败，请检查 FFmpeg 配置或视频文件。
+    :: 检查切片是否成功
+    if %ERRORLEVEL% EQU 0 (
+        echo 切片完成！文件已保存至：!SUB_DIR!
+    ) else (
+        echo 切片失败，请检查 FFmpeg 配置或视频文件。
+    )
 )
 
 pause
